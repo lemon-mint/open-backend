@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"regexp"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -21,6 +23,7 @@ func (User) Fields() []ent.Field {
 		field.String("hash"),
 		field.String("salt"),
 		field.Int32("algorithm").Default(int32(password.DefaultAlgorithm)),
+		field.String("email").Match(regexp.MustCompile(`(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)`)).Unique(),
 	}
 }
 

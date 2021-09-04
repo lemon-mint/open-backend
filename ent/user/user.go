@@ -17,6 +17,8 @@ const (
 	FieldSalt = "salt"
 	// FieldAlgorithm holds the string denoting the algorithm field in the database.
 	FieldAlgorithm = "algorithm"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 )
@@ -29,6 +31,7 @@ var Columns = []string{
 	FieldHash,
 	FieldSalt,
 	FieldAlgorithm,
+	FieldEmail,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -44,4 +47,6 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultAlgorithm holds the default value on creation for the "algorithm" field.
 	DefaultAlgorithm int32
+	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	EmailValidator func(string) error
 )

@@ -26,6 +26,8 @@ type User struct {
 	Salt string `json:"salt,omitempty"`
 	// Algorithm holds the value of the "algorithm" field.
 	Algorithm int32 `json:"algorithm,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,7 +37,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldAlgorithm:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldHash, user.FieldSalt:
+		case user.FieldUsername, user.FieldHash, user.FieldSalt, user.FieldEmail:
 			values[i] = new(sql.NullString)
 		case user.FieldUUID:
 			values[i] = new(uuid.UUID)
@@ -90,6 +92,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Algorithm = int32(value.Int64)
 			}
+		case user.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				u.Email = value.String
+			}
 		}
 	}
 	return nil
@@ -128,6 +136,8 @@ func (u *User) String() string {
 	builder.WriteString(u.Salt)
 	builder.WriteString(", algorithm=")
 	builder.WriteString(fmt.Sprintf("%v", u.Algorithm))
+	builder.WriteString(", email=")
+	builder.WriteString(u.Email)
 	builder.WriteByte(')')
 	return builder.String()
 }

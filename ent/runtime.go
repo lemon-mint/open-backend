@@ -17,4 +17,8 @@ func init() {
 	userDescAlgorithm := userFields[4].Descriptor()
 	// user.DefaultAlgorithm holds the default value on creation for the algorithm field.
 	user.DefaultAlgorithm = userDescAlgorithm.Default.(int32)
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[5].Descriptor()
+	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
 }

@@ -16,6 +16,7 @@ var (
 		{Name: "hash", Type: field.TypeString},
 		{Name: "salt", Type: field.TypeString},
 		{Name: "algorithm", Type: field.TypeInt32, Default: 0},
+		{Name: "email", Type: field.TypeString, Unique: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
