@@ -30,8 +30,9 @@ func main() {
 
 	// Create a new server
 	server := &fasthttp.Server{
-		ReadTimeout:     time.Second * 30,
-		WriteTimeout:    time.Second * 30,
+		ReadTimeout:     time.Second * 15,
+		WriteTimeout:    time.Minute * 15,
+		IdleTimeout:     time.Second * 15,
 		CloseOnShutdown: true,
 		Handler:         func(ctx *fasthttp.RequestCtx) {},
 	}
@@ -56,12 +57,23 @@ func main() {
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
+	Signals := make(chan os.Signal, 1)
+	signal.Notify(Signals, os.Interrupt, syscall.SIGTERM)
+	<-Signals
 	infolog.Println("Server is shutting down...")
-	err = server.Shutdown()
-	if err != nil {
-		errlog.Println("Error during shutdown:", err)
+	shutdown := make(chan struct{})
+	go func() {
+		err = server.Shutdown()
+		if err != nil {
+			errlog.Println("Error during shutdown:", err)
+		}
+		shutdown <- struct{}{}
+	}()
+
+	select {
+	case <-shutdown:
+		infolog.Println("Server successfully down")
+	case <-Signals:
+		errlog.Println("Non-graceful shutdown")
 	}
 }
