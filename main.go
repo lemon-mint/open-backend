@@ -34,7 +34,6 @@ func main() {
 		WriteTimeout:    time.Minute * 15,
 		IdleTimeout:     time.Second * 15,
 		CloseOnShutdown: true,
-		Handler:         func(ctx *fasthttp.RequestCtx) {},
 	}
 
 	r := routes()

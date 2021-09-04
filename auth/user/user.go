@@ -1,7 +1,11 @@
 package user
 
-import "context"
+import (
+	"context"
 
-func CreateUser(ctx context.Context, UserName, PassWord []byte) error {
+	"github.com/lemon-mint/open-backend/ent"
+)
+
+func CreateUser(c *ent.Client, ctx context.Context, Username, Password []byte) error {
 	return nil
 }
