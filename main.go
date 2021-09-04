@@ -42,10 +42,16 @@ func main() {
 	go func() {
 		if os.Getenv("PORT") != "" {
 			infolog.Println("Server starting on port", os.Getenv("PORT"))
-			errlog.Fatalln(server.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT"))))
+			err := server.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")))
+			if err != nil {
+				errlog.Println(err)
+			}
 		} else {
 			infolog.Println("Server starting on port 8080")
-			errlog.Fatalln(server.ListenAndServe(":8080"))
+			err := server.ListenAndServe(":8080")
+			if err != nil {
+				errlog.Println(err)
+			}
 		}
 	}()
 
