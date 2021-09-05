@@ -9,5 +9,8 @@ import (
 // Group is the predicate function for group builders.
 type Group func(*sql.Selector)
 
+// Resource is the predicate function for resource builders.
+type Resource func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

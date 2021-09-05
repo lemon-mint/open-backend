@@ -10,7 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/lemon-mint/open-backend/ent/group"
+	"github.com/lemon-mint/open-backend/ent/resource"
 	"github.com/lemon-mint/open-backend/ent/user"
 )
 
@@ -74,6 +76,21 @@ func (gc *GroupCreate) AddUsers(u ...*User) *GroupCreate {
 		ids[i] = u[i].ID
 	}
 	return gc.AddUserIDs(ids...)
+}
+
+// AddResourceIDs adds the "resources" edge to the Resource entity by IDs.
+func (gc *GroupCreate) AddResourceIDs(ids ...uuid.UUID) *GroupCreate {
+	gc.mutation.AddResourceIDs(ids...)
+	return gc
+}
+
+// AddResources adds the "resources" edges to the Resource entity.
+func (gc *GroupCreate) AddResources(r ...*Resource) *GroupCreate {
+	ids := make([]uuid.UUID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return gc.AddResourceIDs(ids...)
 }
 
 // Mutation returns the GroupMutation object of the builder.
@@ -241,6 +258,25 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := gc.mutation.ResourcesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.ResourcesTable,
+			Columns: []string{group.ResourcesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: resource.FieldID,
 				},
 			},
 		}

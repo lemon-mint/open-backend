@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/lemon-mint/open-backend/ent/group"
+	"github.com/lemon-mint/open-backend/ent/resource"
 	"github.com/lemon-mint/open-backend/ent/user"
 )
 
@@ -30,8 +31,9 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		group.Table: group.ValidColumn,
-		user.Table:  user.ValidColumn,
+		group.Table:    group.ValidColumn,
+		resource.Table: resource.ValidColumn,
+		user.Table:     user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

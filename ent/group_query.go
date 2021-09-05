@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/lemon-mint/open-backend/ent/group"
 	"github.com/lemon-mint/open-backend/ent/predicate"
+	"github.com/lemon-mint/open-backend/ent/resource"
 	"github.com/lemon-mint/open-backend/ent/user"
 )
 
@@ -27,7 +28,8 @@ type GroupQuery struct {
 	fields     []string
 	predicates []predicate.Group
 	// eager-loading edges.
-	withUsers *UserQuery
+	withUsers     *UserQuery
+	withResources *ResourceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,6 +81,28 @@ func (gq *GroupQuery) QueryUsers() *UserQuery {
 			sqlgraph.From(group.Table, group.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, group.UsersTable, group.UsersPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryResources chains the current query on the "resources" edge.
+func (gq *GroupQuery) QueryResources() *ResourceQuery {
+	query := &ResourceQuery{config: gq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := gq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := gq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(group.Table, group.FieldID, selector),
+			sqlgraph.To(resource.Table, resource.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, group.ResourcesTable, group.ResourcesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
 		return fromU, nil
@@ -262,12 +286,13 @@ func (gq *GroupQuery) Clone() *GroupQuery {
 		return nil
 	}
 	return &GroupQuery{
-		config:     gq.config,
-		limit:      gq.limit,
-		offset:     gq.offset,
-		order:      append([]OrderFunc{}, gq.order...),
-		predicates: append([]predicate.Group{}, gq.predicates...),
-		withUsers:  gq.withUsers.Clone(),
+		config:        gq.config,
+		limit:         gq.limit,
+		offset:        gq.offset,
+		order:         append([]OrderFunc{}, gq.order...),
+		predicates:    append([]predicate.Group{}, gq.predicates...),
+		withUsers:     gq.withUsers.Clone(),
+		withResources: gq.withResources.Clone(),
 		// clone intermediate query.
 		sql:  gq.sql.Clone(),
 		path: gq.path,
@@ -282,6 +307,17 @@ func (gq *GroupQuery) WithUsers(opts ...func(*UserQuery)) *GroupQuery {
 		opt(query)
 	}
 	gq.withUsers = query
+	return gq
+}
+
+// WithResources tells the query-builder to eager-load the nodes that are connected to
+// the "resources" edge. The optional arguments are used to configure the query builder of the edge.
+func (gq *GroupQuery) WithResources(opts ...func(*ResourceQuery)) *GroupQuery {
+	query := &ResourceQuery{config: gq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	gq.withResources = query
 	return gq
 }
 
@@ -350,8 +386,9 @@ func (gq *GroupQuery) sqlAll(ctx context.Context) ([]*Group, error) {
 	var (
 		nodes       = []*Group{}
 		_spec       = gq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			gq.withUsers != nil,
+			gq.withResources != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -436,6 +473,35 @@ func (gq *GroupQuery) sqlAll(ctx context.Context) ([]*Group, error) {
 			for i := range nodes {
 				nodes[i].Edges.Users = append(nodes[i].Edges.Users, n)
 			}
+		}
+	}
+
+	if query := gq.withResources; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*Group)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Resources = []*Resource{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Resource(func(s *sql.Selector) {
+			s.Where(sql.InValues(group.ResourcesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.group_resources
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "group_resources" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "group_resources" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Resources = append(node.Edges.Resources, n)
 		}
 	}
 

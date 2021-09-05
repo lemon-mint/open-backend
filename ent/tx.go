@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// Resource is the client for interacting with the Resource builders.
+	Resource *ResourceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -152,6 +154,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Group = NewGroupClient(tx.config)
+	tx.Resource = NewResourceClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
