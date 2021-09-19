@@ -26,8 +26,8 @@ var (
 	ResourcesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "group", Type: field.TypeJSON},
-		{Name: "others", Type: field.TypeJSON},
+		{Name: "acls", Type: field.TypeJSON},
+		{Name: "default", Type: field.TypeJSON},
 		{Name: "group_resources", Type: field.TypeInt, Nullable: true},
 	}
 	// ResourcesTable holds the schema information for the "resources" table.

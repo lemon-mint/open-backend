@@ -18,8 +18,8 @@ func (Resource) Fields() []ent.Field {
 		field.UUID("id", uuid.New()),
 		field.String("name").Unique(),
 
-		field.Strings("group"),
-		field.Strings("others"),
+		field.Strings("acls"),
+		field.Strings("default"),
 	}
 }
 

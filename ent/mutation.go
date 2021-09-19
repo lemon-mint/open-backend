@@ -668,8 +668,8 @@ type ResourceMutation struct {
 	typ           string
 	id            *uuid.UUID
 	name          *string
-	group         *[]string
-	others        *[]string
+	acls          *[]string
+	_default      *[]string
 	clearedFields map[string]struct{}
 	owner         *int
 	clearedowner  bool
@@ -799,76 +799,76 @@ func (m *ResourceMutation) ResetName() {
 	m.name = nil
 }
 
-// SetGroup sets the "group" field.
-func (m *ResourceMutation) SetGroup(s []string) {
-	m.group = &s
+// SetAcls sets the "acls" field.
+func (m *ResourceMutation) SetAcls(s []string) {
+	m.acls = &s
 }
 
-// Group returns the value of the "group" field in the mutation.
-func (m *ResourceMutation) Group() (r []string, exists bool) {
-	v := m.group
+// Acls returns the value of the "acls" field in the mutation.
+func (m *ResourceMutation) Acls() (r []string, exists bool) {
+	v := m.acls
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldGroup returns the old "group" field's value of the Resource entity.
+// OldAcls returns the old "acls" field's value of the Resource entity.
 // If the Resource object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ResourceMutation) OldGroup(ctx context.Context) (v []string, err error) {
+func (m *ResourceMutation) OldAcls(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldGroup is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldAcls is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldGroup requires an ID field in the mutation")
+		return v, fmt.Errorf("OldAcls requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldGroup: %w", err)
+		return v, fmt.Errorf("querying old value for OldAcls: %w", err)
 	}
-	return oldValue.Group, nil
+	return oldValue.Acls, nil
 }
 
-// ResetGroup resets all changes to the "group" field.
-func (m *ResourceMutation) ResetGroup() {
-	m.group = nil
+// ResetAcls resets all changes to the "acls" field.
+func (m *ResourceMutation) ResetAcls() {
+	m.acls = nil
 }
 
-// SetOthers sets the "others" field.
-func (m *ResourceMutation) SetOthers(s []string) {
-	m.others = &s
+// SetDefault sets the "default" field.
+func (m *ResourceMutation) SetDefault(s []string) {
+	m._default = &s
 }
 
-// Others returns the value of the "others" field in the mutation.
-func (m *ResourceMutation) Others() (r []string, exists bool) {
-	v := m.others
+// Default returns the value of the "default" field in the mutation.
+func (m *ResourceMutation) Default() (r []string, exists bool) {
+	v := m._default
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldOthers returns the old "others" field's value of the Resource entity.
+// OldDefault returns the old "default" field's value of the Resource entity.
 // If the Resource object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ResourceMutation) OldOthers(ctx context.Context) (v []string, err error) {
+func (m *ResourceMutation) OldDefault(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldOthers is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldDefault is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldOthers requires an ID field in the mutation")
+		return v, fmt.Errorf("OldDefault requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOthers: %w", err)
+		return v, fmt.Errorf("querying old value for OldDefault: %w", err)
 	}
-	return oldValue.Others, nil
+	return oldValue.Default, nil
 }
 
-// ResetOthers resets all changes to the "others" field.
-func (m *ResourceMutation) ResetOthers() {
-	m.others = nil
+// ResetDefault resets all changes to the "default" field.
+func (m *ResourceMutation) ResetDefault() {
+	m._default = nil
 }
 
 // SetOwnerID sets the "owner" edge to the Group entity by id.
@@ -933,11 +933,11 @@ func (m *ResourceMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, resource.FieldName)
 	}
-	if m.group != nil {
-		fields = append(fields, resource.FieldGroup)
+	if m.acls != nil {
+		fields = append(fields, resource.FieldAcls)
 	}
-	if m.others != nil {
-		fields = append(fields, resource.FieldOthers)
+	if m._default != nil {
+		fields = append(fields, resource.FieldDefault)
 	}
 	return fields
 }
@@ -949,10 +949,10 @@ func (m *ResourceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case resource.FieldName:
 		return m.Name()
-	case resource.FieldGroup:
-		return m.Group()
-	case resource.FieldOthers:
-		return m.Others()
+	case resource.FieldAcls:
+		return m.Acls()
+	case resource.FieldDefault:
+		return m.Default()
 	}
 	return nil, false
 }
@@ -964,10 +964,10 @@ func (m *ResourceMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case resource.FieldName:
 		return m.OldName(ctx)
-	case resource.FieldGroup:
-		return m.OldGroup(ctx)
-	case resource.FieldOthers:
-		return m.OldOthers(ctx)
+	case resource.FieldAcls:
+		return m.OldAcls(ctx)
+	case resource.FieldDefault:
+		return m.OldDefault(ctx)
 	}
 	return nil, fmt.Errorf("unknown Resource field %s", name)
 }
@@ -984,19 +984,19 @@ func (m *ResourceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case resource.FieldGroup:
+	case resource.FieldAcls:
 		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetGroup(v)
+		m.SetAcls(v)
 		return nil
-	case resource.FieldOthers:
+	case resource.FieldDefault:
 		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetOthers(v)
+		m.SetDefault(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Resource field %s", name)
@@ -1050,11 +1050,11 @@ func (m *ResourceMutation) ResetField(name string) error {
 	case resource.FieldName:
 		m.ResetName()
 		return nil
-	case resource.FieldGroup:
-		m.ResetGroup()
+	case resource.FieldAcls:
+		m.ResetAcls()
 		return nil
-	case resource.FieldOthers:
-		m.ResetOthers()
+	case resource.FieldDefault:
+		m.ResetDefault()
 		return nil
 	}
 	return fmt.Errorf("unknown Resource field %s", name)

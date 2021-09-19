@@ -20,10 +20,10 @@ type Resource struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Group holds the value of the "group" field.
-	Group []string `json:"group,omitempty"`
-	// Others holds the value of the "others" field.
-	Others []string `json:"others,omitempty"`
+	// Acls holds the value of the "acls" field.
+	Acls []string `json:"acls,omitempty"`
+	// Default holds the value of the "default" field.
+	Default []string `json:"default,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ResourceQuery when eager-loading is set.
 	Edges           ResourceEdges `json:"edges"`
@@ -58,7 +58,7 @@ func (*Resource) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case resource.FieldGroup, resource.FieldOthers:
+		case resource.FieldAcls, resource.FieldDefault:
 			values[i] = new([]byte)
 		case resource.FieldName:
 			values[i] = new(sql.NullString)
@@ -93,20 +93,20 @@ func (r *Resource) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.Name = value.String
 			}
-		case resource.FieldGroup:
+		case resource.FieldAcls:
 			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field group", values[i])
+				return fmt.Errorf("unexpected type %T for field acls", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &r.Group); err != nil {
-					return fmt.Errorf("unmarshal field group: %w", err)
+				if err := json.Unmarshal(*value, &r.Acls); err != nil {
+					return fmt.Errorf("unmarshal field acls: %w", err)
 				}
 			}
-		case resource.FieldOthers:
+		case resource.FieldDefault:
 			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field others", values[i])
+				return fmt.Errorf("unexpected type %T for field default", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &r.Others); err != nil {
-					return fmt.Errorf("unmarshal field others: %w", err)
+				if err := json.Unmarshal(*value, &r.Default); err != nil {
+					return fmt.Errorf("unmarshal field default: %w", err)
 				}
 			}
 		case resource.ForeignKeys[0]:
@@ -151,10 +151,10 @@ func (r *Resource) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", r.ID))
 	builder.WriteString(", name=")
 	builder.WriteString(r.Name)
-	builder.WriteString(", group=")
-	builder.WriteString(fmt.Sprintf("%v", r.Group))
-	builder.WriteString(", others=")
-	builder.WriteString(fmt.Sprintf("%v", r.Others))
+	builder.WriteString(", acls=")
+	builder.WriteString(fmt.Sprintf("%v", r.Acls))
+	builder.WriteString(", default=")
+	builder.WriteString(fmt.Sprintf("%v", r.Default))
 	builder.WriteByte(')')
 	return builder.String()
 }

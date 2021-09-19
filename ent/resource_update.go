@@ -33,15 +33,15 @@ func (ru *ResourceUpdate) SetName(s string) *ResourceUpdate {
 	return ru
 }
 
-// SetGroup sets the "group" field.
-func (ru *ResourceUpdate) SetGroup(s []string) *ResourceUpdate {
-	ru.mutation.SetGroup(s)
+// SetAcls sets the "acls" field.
+func (ru *ResourceUpdate) SetAcls(s []string) *ResourceUpdate {
+	ru.mutation.SetAcls(s)
 	return ru
 }
 
-// SetOthers sets the "others" field.
-func (ru *ResourceUpdate) SetOthers(s []string) *ResourceUpdate {
-	ru.mutation.SetOthers(s)
+// SetDefault sets the "default" field.
+func (ru *ResourceUpdate) SetDefault(s []string) *ResourceUpdate {
+	ru.mutation.SetDefault(s)
 	return ru
 }
 
@@ -154,18 +154,18 @@ func (ru *ResourceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: resource.FieldName,
 		})
 	}
-	if value, ok := ru.mutation.Group(); ok {
+	if value, ok := ru.mutation.Acls(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldGroup,
+			Column: resource.FieldAcls,
 		})
 	}
-	if value, ok := ru.mutation.Others(); ok {
+	if value, ok := ru.mutation.Default(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldOthers,
+			Column: resource.FieldDefault,
 		})
 	}
 	if ru.mutation.OwnerCleared() {
@@ -228,15 +228,15 @@ func (ruo *ResourceUpdateOne) SetName(s string) *ResourceUpdateOne {
 	return ruo
 }
 
-// SetGroup sets the "group" field.
-func (ruo *ResourceUpdateOne) SetGroup(s []string) *ResourceUpdateOne {
-	ruo.mutation.SetGroup(s)
+// SetAcls sets the "acls" field.
+func (ruo *ResourceUpdateOne) SetAcls(s []string) *ResourceUpdateOne {
+	ruo.mutation.SetAcls(s)
 	return ruo
 }
 
-// SetOthers sets the "others" field.
-func (ruo *ResourceUpdateOne) SetOthers(s []string) *ResourceUpdateOne {
-	ruo.mutation.SetOthers(s)
+// SetDefault sets the "default" field.
+func (ruo *ResourceUpdateOne) SetDefault(s []string) *ResourceUpdateOne {
+	ruo.mutation.SetDefault(s)
 	return ruo
 }
 
@@ -373,18 +373,18 @@ func (ruo *ResourceUpdateOne) sqlSave(ctx context.Context) (_node *Resource, err
 			Column: resource.FieldName,
 		})
 	}
-	if value, ok := ruo.mutation.Group(); ok {
+	if value, ok := ruo.mutation.Acls(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldGroup,
+			Column: resource.FieldAcls,
 		})
 	}
-	if value, ok := ruo.mutation.Others(); ok {
+	if value, ok := ruo.mutation.Default(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldOthers,
+			Column: resource.FieldDefault,
 		})
 	}
 	if ruo.mutation.OwnerCleared() {

@@ -28,6 +28,8 @@ func main() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
+	initDB(client)
+
 	// Create a new server
 	server := &fasthttp.Server{
 		ReadTimeout:     time.Second * 15,

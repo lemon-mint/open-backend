@@ -9,10 +9,10 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldGroup holds the string denoting the group field in the database.
-	FieldGroup = "group"
-	// FieldOthers holds the string denoting the others field in the database.
-	FieldOthers = "others"
+	// FieldAcls holds the string denoting the acls field in the database.
+	FieldAcls = "acls"
+	// FieldDefault holds the string denoting the default field in the database.
+	FieldDefault = "default"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the resource in the database.
@@ -30,8 +30,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
-	FieldGroup,
-	FieldOthers,
+	FieldAcls,
+	FieldDefault,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "resources"

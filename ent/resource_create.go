@@ -27,15 +27,15 @@ func (rc *ResourceCreate) SetName(s string) *ResourceCreate {
 	return rc
 }
 
-// SetGroup sets the "group" field.
-func (rc *ResourceCreate) SetGroup(s []string) *ResourceCreate {
-	rc.mutation.SetGroup(s)
+// SetAcls sets the "acls" field.
+func (rc *ResourceCreate) SetAcls(s []string) *ResourceCreate {
+	rc.mutation.SetAcls(s)
 	return rc
 }
 
-// SetOthers sets the "others" field.
-func (rc *ResourceCreate) SetOthers(s []string) *ResourceCreate {
-	rc.mutation.SetOthers(s)
+// SetDefault sets the "default" field.
+func (rc *ResourceCreate) SetDefault(s []string) *ResourceCreate {
+	rc.mutation.SetDefault(s)
 	return rc
 }
 
@@ -137,11 +137,11 @@ func (rc *ResourceCreate) check() error {
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
 	}
-	if _, ok := rc.mutation.Group(); !ok {
-		return &ValidationError{Name: "group", err: errors.New(`ent: missing required field "group"`)}
+	if _, ok := rc.mutation.Acls(); !ok {
+		return &ValidationError{Name: "acls", err: errors.New(`ent: missing required field "acls"`)}
 	}
-	if _, ok := rc.mutation.Others(); !ok {
-		return &ValidationError{Name: "others", err: errors.New(`ent: missing required field "others"`)}
+	if _, ok := rc.mutation.Default(); !ok {
+		return &ValidationError{Name: "default", err: errors.New(`ent: missing required field "default"`)}
 	}
 	return nil
 }
@@ -183,21 +183,21 @@ func (rc *ResourceCreate) createSpec() (*Resource, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if value, ok := rc.mutation.Group(); ok {
+	if value, ok := rc.mutation.Acls(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldGroup,
+			Column: resource.FieldAcls,
 		})
-		_node.Group = value
+		_node.Acls = value
 	}
-	if value, ok := rc.mutation.Others(); ok {
+	if value, ok := rc.mutation.Default(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeJSON,
 			Value:  value,
-			Column: resource.FieldOthers,
+			Column: resource.FieldDefault,
 		})
-		_node.Others = value
+		_node.Default = value
 	}
 	if nodes := rc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
